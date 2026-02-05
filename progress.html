@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+            :root {
+                --bg-color: #f5f5f7;
+                --card-bg: #ffffff;
+                --bar-bg: #e0e0e0;
+                --primary-color: #3b82f6;
+                --text-main: #333333;
+                --text-sub: #666666;
+                --radius: 8px;
+            }
+
+            body {
+                font-family:
+                    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                    Helvetica, Arial, sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                background-color: var(--bg-color);
+            }
+
+            .widget-container {
+                width: 350px;
+                padding: 0;
+                background-color: transparent;
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 20px;
+                font-weight: 600;
+                color: var(--text-main);
+                font-size: 1.1em;
+            }
+
+            .progress-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 12px;
+            }
+
+            .progress-item:last-child {
+                margin-bottom: 0;
+            }
+
+            .progress-track {
+                height: 10px;
+                background-color: var(--bar-bg);
+                border-radius: var(--radius);
+                overflow: hidden;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background-color: var(--primary-color);
+                width: 0%;
+                border-radius: var(--radius);
+                transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            .label-text {
+                width: 40px;
+                text-align: left;
+                font-size: 0.9em;
+                color: var(--text-main);
+                flex-shrink: 0;
+            }
+
+            .value-text {
+                width: 35px;
+                text-align: right;
+                font-size: 0.85em;
+                color: var(--text-sub);
+                font-variant-numeric: tabular-nums;
+                flex-shrink: 0;
+            }
+
+            .progress-track {
+                flex: 1;
+                margin: 0 12px;
+                height: 8px;
+                background-color: #e5e5e5;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+
+            .fill-day {
+                background-color: #85def2;
+            }
+            .fill-week {
+                background-color: #66b8d9;
+            }
+            .fill-month {
+                background-color: #a64669;
+            }
+            .fill-year {
+                background-color: #a61f2b;
+            }
+            .fill-life {
+                background-color: #400409;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="widget-container">
+            <div class="progress-item">
+                <span class="label-text">Day</span>
+                <div class="progress-track">
+                    <div class="progress-fill fill-day" id="bar-day"></div>
+                </div>
+                <span class="value-text" id="text-day">0%</span>
+            </div>
+
+            <div class="progress-item">
+                <span class="label-text">Week</span>
+                <div class="progress-track">
+                    <div class="progress-fill fill-week" id="bar-week"></div>
+                </div>
+                <span class="value-text" id="text-week">0%</span>
+            </div>
+
+            <div class="progress-item">
+                <span class="label-text">Month</span>
+                <div class="progress-track">
+                    <div class="progress-fill fill-month" id="bar-month"></div>
+                </div>
+                <span class="value-text" id="text-month">0%</span>
+            </div>
+
+            <div class="progress-item">
+                <span class="label-text">Year</span>
+                <div class="progress-track">
+                    <div class="progress-fill fill-year" id="bar-year"></div>
+                </div>
+                <span class="value-text" id="text-year">0%</span>
+            </div>
+
+            <div class="progress-item">
+                <span class="label-text">Life</span>
+                <div class="progress-track">
+                    <div class="progress-fill fill-life" id="bar-life"></div>
+                </div>
+                <span class="value-text" id="text-life">0%</span>
+            </div>
+        </div>
+
+        <script>
+            // set birthday 'YYYY-MM-DD'
+            const BIRTHDAY = "2000-01-01";
+            const LIFE_EXPECTANCY_YEARS = 80;
+
+            function updateProgress() {
+                const now = new Date();
+
+                // day
+                const startOfDay = new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    now.getDate(),
+                    0,
+                    0,
+                    0,
+                );
+                const endOfDay = new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    now.getDate(),
+                    23,
+                    59,
+                    59,
+                );
+                const dayProgress =
+                    ((now - startOfDay) / (endOfDay - startOfDay)) * 100;
+
+                // week
+                const currentDay = now.getDay();
+                const distanceToMonday = currentDay === 0 ? 6 : currentDay - 1;
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - distanceToMonday);
+                startOfWeek.setHours(0, 0, 0, 0);
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 7);
+                const weekProgress =
+                    ((now - startOfWeek) / (endOfWeek - startOfWeek)) * 100;
+
+                // month
+                const startOfMonth = new Date(
+                    now.getFullYear(),
+                    now.getMonth(),
+                    1,
+                );
+                const endOfMonth = new Date(
+                    now.getFullYear(),
+                    now.getMonth() + 1,
+                    0,
+                    23,
+                    59,
+                    59,
+                );
+                const monthProgress =
+                    ((now - startOfMonth) / (endOfMonth - startOfMonth)) * 100;
+
+                // year
+                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                const endOfYear = new Date(
+                    now.getFullYear(),
+                    11,
+                    31,
+                    23,
+                    59,
+                    59,
+                );
+                const yearProgress =
+                    ((now - startOfYear) / (endOfYear - startOfYear)) * 100;
+
+                // life
+                const birthDate = new Date(BIRTHDAY);
+                const endOfLife = new Date(birthDate);
+                endOfLife.setFullYear(
+                    birthDate.getFullYear() + LIFE_EXPECTANCY_YEARS,
+                );
+                let lifeProgress =
+                    ((now - birthDate) / (endOfLife - birthDate)) * 100;
+                if (lifeProgress > 100) lifeProgress = 100;
+
+                updateBar("day", dayProgress);
+                updateBar("week", weekProgress);
+                updateBar("month", monthProgress);
+                updateBar("year", yearProgress);
+                updateBar("life", lifeProgress);
+            }
+
+            function updateBar(idSuffix, value) {
+                const percentage = value.toFixed(1) + "%";
+                document.getElementById(`bar-${idSuffix}`).style.width =
+                    percentage;
+                document.getElementById(`text-${idSuffix}`).innerText =
+                    percentage;
+            }
+
+            updateProgress();
+            // setInterval(updateProgress, 1000);
+        </script>
+    </body>
+</html>
